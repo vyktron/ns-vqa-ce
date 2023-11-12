@@ -1,0 +1,41 @@
+
+train: train/images
+val: val/images
+
+nc: 96
+# Size : Large, Small
+# Material : Metal, Rubber
+# Shape : Sphere, Cube, Cylinder
+# Color : Red, Green, Blue, Cyan, Purple, Brown, Yellow, Gray
+names: ['Large_Red_Metal_Sphere', Large_Red_Metal_Cube', Large_Red_Metal_Cylinder', 
+'Large_Red_Rubber_Sphere','Large_Red_Rubber_Cube','Large_Red_Rubber_Cylinder',
+'Large_Green_Metal_Sphere', 'Large_Green_Metal_Cube', 'Large_Green_Metal_Cylinder', 
+'Large_Green_Rubber_Sphere', 'Large_Green_Rubber_Cube', 'Large_Green_Rubber_Cylinder', 
+'Large_Blue_Metal_Sphere', 'Large_Blue_Metal_Cube', 'Large_Blue_Metal_Cylinder', 
+'Large_Blue_Rubber_Sphere', 'Large_Blue_Rubber_Cube', 'Large_Blue_Rubber_Cylinder', 
+'Large_Cyan_Metal_Sphere', 'Large_Cyan_Metal_Cube', 'Large_Cyan_Metal_Cylinder', 
+'Large_Cyan_Rubber_Sphere', 'Large_Cyan_Rubber_Cube', 'Large_Cyan_Rubber_Cylinder', 
+'Large_Purple_Metal_Sphere', 'Large_Purple_Metal_Cube', 'Large_Purple_Metal_Cylinder', 
+'Large_Purple_Rubber_Sphere', 'Large_Purple_Rubber_Cube', 'Large_Purple_Rubber_Cylinder', 
+'Large_Brown_Metal_Sphere', 'Large_Brown_Metal_Cube', 'Large_Brown_Metal_Cylinder', 
+'Large_Brown_Rubber_Sphere', 'Large_Brown_Rubber_Cube', 'Large_Brown_Rubber_Cylinder', 
+'Large_Yellow_Metal_Sphere', 'Large_Yellow_Metal_Cube', 'Large_Yellow_Metal_Cylinder', 
+'Large_Yellow_Rubber_Sphere', 'Large_Yellow_Rubber_Cube', 'Large_Yellow_Rubber_Cylinder', 
+'Large_Gray_Metal_Sphere', 'Large_Gray_Metal_Cube', 'Large_Gray_Metal_Cylinder', 
+'Large_Gray_Rubber_Sphere', 'Large_Gray_Rubber_Cube', 'Large_Gray_Rubber_Cylinder', 
+'Small_Red_Metal_Sphere', 'Small_Red_Metal_Cube', 'Small_Red_Metal_Cylinder', 
+'Small_Red_Rubber_Sphere', 'Small_Red_Rubber_Cube', 'Small_Red_Rubber_Cylinder', 
+'Small_Green_Metal_Sphere', 'Small_Green_Metal_Cube', 'Small_Green_Metal_Cylinder', 
+'Small_Green_Rubber_Sphere', 'Small_Green_Rubber_Cube', 'Small_Green_Rubber_Cylinder',
+'Small_Blue_Metal_Sphere', 'Small_Blue_Metal_Cube', 'Small_Blue_Metal_Cylinder',
+'Small_Blue_Rubber_Sphere', 'Small_Blue_Rubber_Cube', 'Small_Blue_Rubber_Cylinder',
+'Small_Cyan_Metal_Sphere', 'Small_Cyan_Metal_Cube', 'Small_Cyan_Metal_Cylinder',
+'Small_Cyan_Rubber_Sphere', 'Small_Cyan_Rubber_Cube', 'Small_Cyan_Rubber_Cylinder',
+'Small_Purple_Metal_Sphere', 'Small_Purple_Metal_Cube', 'Small_Purple_Metal_Cylinder',
+'Small_Purple_Rubber_Sphere', 'Small_Purple_Rubber_Cube', 'Small_Purple_Rubber_Cylinder',
+'Small_Brown_Metal_Sphere', 'Small_Brown_Metal_Cube', 'Small_Brown_Metal_Cylinder',
+'Small_Brown_Rubber_Sphere', 'Small_Brown_Rubber_Cube', 'Small_Brown_Rubber_Cylinder',
+'Small_Yellow_Metal_Sphere', 'Small_Yellow_Metal_Cube', 'Small_Yellow_Metal_Cylinder',
+'Small_Yellow_Rubber_Sphere', 'Small_Yellow_Rubber_Cube', 'Small_Yellow_Rubber_Cylinder',
+'Small_Gray_Metal_Sphere', 'Small_Gray_Metal_Cube', 'Small_Gray_Metal_Cylinder',
+'Small_Gray_Rubber_Sphere', 'Small_Gray_Rubber_Cube', 'Small_Gray_Rubber_Cylinder']

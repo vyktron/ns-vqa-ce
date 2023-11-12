@@ -1,0 +1,6 @@
+CLEVR_mini
+.venv
+train
+val
+yolov8n-seg.pt
+yolov8n.pt
