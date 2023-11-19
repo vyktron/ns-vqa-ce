@@ -8,6 +8,9 @@ import json
 import h5py
 import numpy as np
 
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import utils.programs as program_utils
 import utils.preprocess as preprocess_utils
 import utils.utils as utils

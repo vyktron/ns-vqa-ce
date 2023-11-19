@@ -20,7 +20,7 @@ class Seq2seq(nn.Module):
     def sample_output(self, x, input_lengths=None):
         encoder_outputs, encoder_hidden = self.encoder(x, input_lengths)
         output_symbols, _ = self.decoder.forward_sample(encoder_outputs, encoder_hidden)
-        return torch.stack(output_symbols).transpose(0,1)
+        return torch.stack(output_symbols)
 
     def reinforce_forward(self, x, input_lengths=None):
         encoder_outputs, encoder_hidden = self.encoder(x, input_lengths)

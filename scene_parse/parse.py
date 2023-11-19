@@ -1,1 +1,0 @@
-# Script that will be used to parse the scene data

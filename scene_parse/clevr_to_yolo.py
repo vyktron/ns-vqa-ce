@@ -150,11 +150,37 @@ def empty_all() :
         for filename in os.listdir(os.path.join(dir, "images")):
             if filename.endswith(".png"):
                 os.remove(os.path.join(dir, "images", filename))
-    
+
+def set_split() :
+
+    # List images in val folder
+    dir = os.path.join(target_dir, "val")
+    list_val = os.listdir(os.path.join(dir, "images"))
+
+    # Load the annotations file
+    with open(annotations_file, "r") as f:
+        annotations = json.load(f)
+        scenes = annotations["scenes"]
+        for s in scenes :
+            if s["image_filename"] in list_val :
+                s["split"] = "val"
+            else :
+                s["split"] = "train"
+
+    # Save the annotations file
+    with open(annotations_file, "w") as f:
+        json.dump(annotations, f)
+
+
+#TODO Run the complete pipeline (copy on run_test.py to do so) => Extraire les résultats
+#TODO Bonus : Faire la partie CE
 
 if __name__ == "__main__":
+    
     empty_all()
     split()
     move_in_folder()
     create_txt_files()
     remove_json()
+    set_split()
+    

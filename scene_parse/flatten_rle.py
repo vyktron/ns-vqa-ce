@@ -46,11 +46,10 @@ def flatten_rle(rle_mask):
     image_size = [image_size[1], image_size[0]]
     return mask_to_yolov8(binary_mask, image_size)
 
-
-
 # Example usage
-rle_mask = {"mask": {"size": [320, 480], "counts": "lVb3`0X99G:E:G9G9G8L5M3N1O2O0O2O0O2O001N10001O0O101O00001O000O10001O0000000000001O0000000001O00000000000000001N100000001O0O10001N10000O2N100O2N1O1O2L3L5I6K6J5K6J6J5K6J6J6J7Hhb9"}}
-image_size = rle_mask["mask"]["size"]
-visualize_mask(flatten_rle(rle_mask["mask"]), image_size)
+if __name__ == "__main__" :
+    rle_mask = {"mask": {"size": [320, 480], "counts": "lVb3`0X99G:E:G9G9G8L5M3N1O2O0O2O0O2O001N10001O0O101O00001O000O10001O0000000000001O0000000001O00000000000000001N100000001O0O10001N10000O2N100O2N1O1O2L3L5I6K6J5K6J6J5K6J6J6J7Hhb9"}}
+    image_size = rle_mask["mask"]["size"]
+    visualize_mask(flatten_rle(rle_mask["mask"]), image_size)
 
 
