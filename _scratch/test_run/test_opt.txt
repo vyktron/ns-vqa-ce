@@ -7,11 +7,11 @@ manual_seed: None
 gpu_ids: []
 visualize: 0
 clevr_train_scene_path: ../data/raw/CLEVR_v1.0/scenes/CLEVR_train_scenes.json
-clevr_val_scene_path: ../scene_parse/images/val_scene.json
+clevr_val_scene_path: scene_parse/images/val_scene.json
 clevr_train_question_path: ../data/reason/clevr_h5/clevr_train_questions.h5
 clevr_val_question_path: ../data/reason/clevr_h5/clevr_val_questions.h5
-clevr_vocab_path: ../data/reason/clevr_h5/clevr_vocab.json
-load_checkpoint_path: ../data/pretrained/question_parser.pt
-save_result_path: ../data/reason/results
+clevr_vocab_path: data/reason/clevr_h5/clevr_vocab.json
+load_checkpoint_path: data/pretrained/question_parser.pt
+save_result_path: data/reason/results
 max_val_samples: None
 batch_size: 256

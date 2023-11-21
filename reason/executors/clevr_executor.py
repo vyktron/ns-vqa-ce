@@ -33,10 +33,9 @@ CLEVR_ANSWER_CANDIDATES = {
 class ClevrExecutor:
     """Symbolic program executor for CLEVR"""
 
-    def __init__(self, val_scene_json, test_scene_json, vocab_json):
+    def __init__(self, val_scene_json, vocab_json):
         self.scenes = {
-            'val': utils.load_scenes(val_scene_json),
-            'test' : utils.load_scenes(test_scene_json)
+            'val': utils.load_scenes(val_scene_json)
         }
         self.vocab = utils.load_vocab(vocab_json)
         self.colors = CLEVR_COLORS
@@ -50,7 +49,7 @@ class ClevrExecutor:
     
     def run(self, x, index, split, guess=False, debug=False):
         assert self.modules and self.scenes, 'Must have scene annotations and define modules first'
-        assert split == 'test' or split == 'val'
+        assert split == 'val'
 
         ans, temp = None, None
 

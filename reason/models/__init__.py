@@ -1,7 +1,12 @@
 from .encoder import Encoder
 from .decoder import Decoder
 from .seq2seq import Seq2seq
-import utils.utils as utils
+
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import reason.utils.utils as utils
 
 
 def get_vocab(opt):
