@@ -5,6 +5,7 @@ val
 test
 yolov8n-seg.pt
 yolov8n.pt
-data
+clevr_test_questions.h5
+clevr_train_questions.h5
 questions
 *.pyc
