@@ -47,7 +47,7 @@ class ClevrExecutor:
         self.modules = {}
         self._register_modules()
     
-    def run(self, x, index, split, guess=False, debug=False):
+    def run(self, x, index, split, guess=False, debug=False, scene=None):
         assert self.modules and self.scenes, 'Must have scene annotations and define modules first'
         assert split == 'val'
 
@@ -62,7 +62,8 @@ class ClevrExecutor:
         if length == 0:
             return 'error'
 
-        scene = self.scenes[split][index]
+        if scene is None:
+            scene = self.scenes[split][index]
         self.exe_trace = []
         for j in range(length):
             i = length - 1 - j
@@ -95,7 +96,7 @@ class ClevrExecutor:
             final_module = self.vocab['program_idx_to_token'][x[0]]
             if final_module in self.answer_candidates:
                 ans = random.choice(self.answer_candidates[final_module])
-        return ans
+        return ans, scene
 
     def _print_debug_message(self, x):
         if type(x) == list:
@@ -468,3 +469,332 @@ class ClevrExecutor:
         if type(scene) == list and len(scene) > 0:
             return scene[0]
         return 'error'
+    
+    # Contrastive Explanation methods
+    def find_foil_answers(self, scene : list[dict], answer : str) -> list :
+        """
+        Find the foil answers for a given question type
+
+        Parameters
+        ----------
+        scene : list[dict]
+            The scene list of objects (dictionaries)
+        answer : str
+            The answer to the question (given by the model)
+        
+        Returns
+        -------
+        list
+            The foil answers
+        """
+
+        # Get the answer candidates
+        if answer == "yes" :
+            candidates = ["no"]
+        elif answer == "no" :
+            candidates = ["yes"]
+        elif answer in self.colors :
+            # Get the colors that are not the answer
+            candidates = [c for c in self.colors if c != answer]
+        elif answer in self.materials :
+            # Get the materials that are not the answer
+            candidates = [m for m in self.materials if m != answer]
+        elif answer in self.shapes :
+            # Get the shapes that are not the answer
+            candidates = [s for s in self.shapes if s != answer]
+        elif answer in self.sizes :
+            # Get the sizes that are not the answer
+            candidates = [s for s in self.sizes if s != answer]
+        elif answer in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] :
+            # Get the integers that are not the answer
+            candidates = [str(i) for i in range(11) if str(i) != answer]
+
+        return candidates
+    
+    # Modification of the scene
+
+    def add_object(self, scene : list[dict], cost=0) -> list :
+        """
+        Add an object to the scene
+
+        Parameters
+        ----------
+        scene : list[dict]
+            The scene list of objects (dictionaries)
+
+        Returns
+        -------
+        list
+            The new scene
+        """
+
+        cost += 12
+
+        # Deep copy the scene
+        scene_ = json.loads(json.dumps(scene))
+        # Construct the new object
+        obj = {
+            "id": str(scene_[0]["id"].split("-")[1]) + "-" + str(len(scene_)),
+            # Random position
+            "position": [random.uniform(-3, 3), random.uniform(-3, 3), 0.35],
+            "color": random.choice(self.colors),
+            "material": random.choice(self.materials),
+            "shape": random.choice(self.shapes),
+            "size": random.choice(self.sizes),
+            "confidence": 1
+        }
+
+        if obj["size"] == "large" :
+            obj["position"][2] = 0.7
+        
+        desc = "add object " + str(len(scene_))
+
+        # Add the object to the scene
+        scene_.append(obj)     
+
+        return scene_, cost, desc
+    
+    def remove_object(self, scene : list[dict], cost=0) -> list :
+        """
+        Remove an object from the scene
+
+        Parameters
+        ----------
+        scene : list[dict]
+            The scene list of objects (dictionaries)
+        
+        Returns
+        -------
+        list
+            The new scene
+        """
+
+        cost += 12
+
+        # Deep copy the scene
+        scene_ = json.loads(json.dumps(scene))
+        # Get a random index
+        index = random.randrange(len(scene_))
+        # Remove the object
+        scene_.pop(index)
+
+        desc = "remove_object " + str(index)
+
+        return scene_, cost, desc
+    
+    def change_shape(self, scene : list[dict], cost=0) -> list :
+        """
+        Change the shape of an object in the scene
+
+        Parameters
+        ----------
+        scene : list[dict]
+            The scene list of objects (dictionaries)
+        object_id : int
+            The id of the object to change the shape
+        
+        Returns
+        -------
+        list
+            The new scene
+        """
+
+        cost += 11
+
+        # Deep copy the scene
+        scene_ = json.loads(json.dumps(scene))
+        # Get a random index
+        index = random.randrange(len(scene_))
+        # Get the object to change the shape
+        obj = scene_[index]
+
+        prev_shape = obj["shape"]
+        # Change the shape
+        obj["shape"] = random.choice([s for s in self.shapes if s != obj["shape"]])
+
+        desc = "change_shape " + str(index) + " : " + prev_shape + " -> " + obj["shape"]
+
+        return scene_, cost, desc
+    
+    def change_color(self, scene : list[dict], cost=0) -> list :
+        """
+        Change the color of an object in the scene
+
+        Parameters
+        ----------
+        scene : list[dict]
+            The scene list of objects (dictionaries)
+        object_id : int
+            The id of the object to change the color
+        
+        Returns
+        -------
+        list
+            The new scene
+        """
+
+        cost += 11
+
+        # Deep copy the scene
+        scene_ = json.loads(json.dumps(scene))
+        # Get a random index
+        index = random.randrange(len(scene_))
+        # Get the object to change the color
+        obj = scene_[index]
+
+        prev_color = obj["color"]
+        # Change the color
+        obj["color"] = random.choice([c for c in self.colors if c != obj["color"]])
+
+        desc = "change_color " + str(index) + " : " + prev_color + " -> " + obj["color"]
+
+        return scene_, cost, desc
+    
+    def change_material(self, scene : list[dict], cost=0) -> list :
+        """
+        Change the material of an object in the scene
+
+        Parameters
+        ----------
+        scene : list[dict]
+            The scene list of objects (dictionaries)
+        object_id : int
+            The id of the object to change the material
+        
+        Returns
+        -------
+        list
+            The new scene
+        """
+
+        cost += 11
+
+        # Deep copy the scene
+        scene_ = json.loads(json.dumps(scene))
+        # Get a random index
+        index = random.randrange(len(scene_))
+        # Get the object to change the material
+        obj = scene_[index]
+
+        prev_material = obj["material"]
+        # Change the material
+        obj["material"] = random.choice([m for m in self.materials if m != obj["material"]])
+
+        desc = "change_material " + str(index) + " : " + prev_material + " -> " + obj["material"]
+
+        return scene_, cost, desc
+    
+    def change_size(self, scene : list[dict], cost=0) -> list :
+        """
+        Change the size of an object in the scene
+
+        Parameters
+        ----------
+        scene : list[dict]
+            The scene list of objects (dictionaries)
+        object_id : int
+            The id of the object to change the size
+        
+        Returns
+        -------
+        list
+            The new scene
+        """
+
+        cost += 11
+
+        # Deep copy the scene
+        scene_ = json.loads(json.dumps(scene))
+        # Get a random index
+        index = random.randrange(len(scene_))
+        # Get the object to change the size
+        obj = scene_[index]
+
+        prev_size = obj["size"]
+        # Change the size
+        obj["size"] = random.choice([s for s in self.sizes if s != obj["size"]])
+        if obj["size"] == "large" :
+            obj["position"][2] = 0.7
+        elif obj["size"] == "small" :
+            obj["position"][2] = 0.35
+
+        desc = "change_size " + str(index) + " : " + prev_size + " -> " + obj["size"]
+
+        return scene_, cost, desc
+
+    def move_object(self, scene : list[dict], cost=0) -> list :
+        """
+        Move an object in the scene to a new position
+
+        Parameters
+        ----------
+        scene : list[dict]
+            The scene list of objects (dictionaries)
+
+        Returns
+        -------
+        list
+            The new scene
+        """
+
+        cost += 11
+
+        # Deep copy the scene
+        scene_ = json.loads(json.dumps(scene))
+        # Get a random index
+        index = random.randrange(len(scene_))
+        # Get the object to move
+        obj = scene_[index]
+        # Choose a random direction
+        direction = random.choice(["up", "down", "left", "right"])
+        # Move the object in the chosen direction (by 0.5)
+        if direction == "up" :
+            obj["position"][1] += 0.5
+        elif direction == "down" :
+            obj["position"][1] -= 0.5
+        elif direction == "left" :
+            obj["position"][0] -= 0.5
+        elif direction == "right" :
+            obj["position"][0] += 0.5
+
+        desc = "move " + direction + " " + str(index)
+
+        return scene_, cost, desc
+    
+    def modify_scene(self, scene : list[dict], cost=0) -> list :
+        """
+        Modify the scene by adding, removing, moving or changing an object
+
+        Parameters
+        ----------
+        scene : list[dict]
+            The scene list of objects (dictionaries)
+        
+        Returns
+        -------
+        list
+            The new scene
+        """
+
+        # Deep copy the scene
+        scene_ = json.loads(json.dumps(scene))
+        # Choose a random modification
+        modification = random.choice(["add", "remove", "move", "change_size", "change_shape", "change_color", "change_material"])
+        # Modify the scene
+        if modification == "add" :
+            scene_, cost, desc = self.add_object(scene_, cost)
+        elif modification == "remove" :
+            scene_, cost, desc = self.remove_object(scene_, cost)
+        elif modification == "move" :
+            scene_, cost, desc = self.move_object(scene_, cost)
+        elif modification == "change_size" :
+            scene_, cost, desc = self.change_size(scene_, cost)
+        elif modification == "change_shape" :
+            scene_, cost, desc = self.change_shape(scene_, cost)
+        elif modification == "change_color" :
+            scene_, cost, desc = self.change_color(scene_, cost)
+        else :
+            scene_, cost, desc = self.change_material(scene_, cost)
+
+        return scene_, cost, desc
+    

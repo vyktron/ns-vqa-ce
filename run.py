@@ -79,11 +79,27 @@ if __name__ == "__main__" :
         pred_program = parser.parse()
         y_np, pg_np, idx_np, ans_np = y.numpy(), pred_program.numpy(), idx.numpy(), ans.numpy()
 
+        # Print the question
+        x_list = x.numpy().tolist()
+        for i in range(1, len(x_list[0])):
+            if x_list[0][i] == 2:
+                print("?")
+                break
+            print(dataset.vocab['question_idx_to_token'][x_list[0][i]], end=" ")
+            #TODO Changer les probabilités de choix des objets pour prendre en compte la confiance de la detection d'objet
+
         for i in range(pg_np.shape[0]):
-            pred_ans = executor.run(pg_np[i], idx_np[i], 'val', guess=True)
+            pred_ans, scene = executor.run(pg_np[i], idx_np[i], 'val', guess=True)
+            print("Scene: %s" % scene)
+            _, _, desc = executor.modify_scene(scene)
+            print("Modification: %s" % desc)
             gt_ans = executor.vocab['answer_idx_to_token'][ans_np[i]]
 
+            print("Predicted answer: %s" % pred_ans)
+            print("Ground truth answer: %s" % gt_ans)
+
             q_type = find_clevr_question_type(executor.vocab['program_idx_to_token'][y_np[i][1]])
+            print("Question type: %s" % q_type)
             if pred_ans == gt_ans:
                 stats[q_type] += 1
                 stats['correct_ans'] += 1
@@ -93,5 +109,6 @@ if __name__ == "__main__" :
             stats['%s_tot' % q_type] += 1
             stats['total'] += 1
         print('| %d/%d questions processed, accuracy %f' % (stats['total'], len(loader.dataset), stats['correct_ans'] / stats['total']))
+        print("\n")
 
     

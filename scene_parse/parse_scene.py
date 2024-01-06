@@ -56,6 +56,9 @@ class SceneParser() :
                 x = (t[0] + t[2]) / 2
                 y = (t[1] + t[3]) / 2
 
+                # Get the confidence of the prediction
+                conf = b.conf.tolist()[0]
+
                 attr = self.get_attr_from_cls(b.cls.tolist()[0])
 
                 size = 0 if attr[0] == "Small" else 1
@@ -67,7 +70,7 @@ class SceneParser() :
                 z = 0.35
                 if size==1 :
                     z += 0.35
-                attributes.append(attr + [round(coords_3d[0], 2), round(coords_3d[1], 2), z])
+                attributes.append(attr + [round(coords_3d[0], 2), round(coords_3d[1], 2), z, round(conf, 2)])
 
         return attributes
     
@@ -136,7 +139,8 @@ def build_dict(attributes : list, index : str) -> dict :
             "color": attr[1].lower(),
             "material": attr[2].lower(),
             "shape": attr[3].lower(),
-            "size": attr[0].lower()
+            "size": attr[0].lower(),
+            "confidence": attr[7]
         }
         # Append the object dictionary to the objects list
         d["objects"].append(o)
