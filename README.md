@@ -97,68 +97,20 @@ Ensuite à partir des objets détectés et leurs coordonnées nous sommes capabl
 
 Le modèle converge effectivement avec notamment une **précision de 99,6%** pour les classes attribuées
 
-### Step 3: reasoning
+### Etape 2: Question Parsing
 
-We are now ready to perform reasoning. The model first parses the questions into programs, and then run the logic of the programs on the abstract scene representations.
-```
-cd {repo_root}/reason
-```
-```
-python tools/run_test.py \
-    --run_dir ../data/reason/results \
-    --load_checkpoint_path ../data/pretrained/question_parser.pt \
-    --clevr_val_scene_path ../data/attr_net/results/clevr_val_scenes_parsed_pretrained.json \
-    --save_result_path ../data/reason/results/result_pretrained.json
-```
-The result statistics can be found in the output file `{repo_root}/data/reason/results/result_pretrained.json`. The pretrained model will yield an overall question answering accuracy of 99.8%, same as reported in the paper.
+L'objectif du question parsing est de traduire les questions formulées en langage naturel en fonctions applicable aux attributs de la scène.
 
-## Train you own model
+Un modèle LSTM (Long-Short Term Memory) est utilisé pour réaliser la question parsing.
+Les LSTM sont adaptés à ce genre de tâches car ils permettent de bien gérer la temporalité des mots dans les questions ainsi que les dépendances à long terme.
 
-### Scene parsing
+1 - Tokenisation : La question est divisée en tokens (unités linguistiques) compréhensibles par le modèle.
 
-Our scene parser is trained on 4000 rendered CLEVR images. The only difference between the rendered images and the original ones is that the rendered images come with object masks. We refer to this dataset as `CLEVR-mini`, which is downloadable via the `download.sh` script. No images from the original training set are used throughout training. 
+2 - Inférence : Le modèle renvoit une suite de token correspondant aux fonctions de raisonnements (filtrer les objets rouges, métalliques...)
 
-1, Train a Mask-RCNN for object detection. We adopt the implementation from [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch). Please go to the link for more details.
-```
-cd {repo_root}/scene_parse/mask_rcnn
-```
-```
-python tools/train_net_step.py \
-    --dataset clevr-mini \
-    --cfg configs/baselines/e2e_mask_rcnn_R-50-FPN_1x.yaml \
-    --bs 8 \
-    --set OUTPUT_DIR ../../data/mask_rcnn/outputs
-```
-The program will determine the training schedule based on the number of GPU used. Our code is tested on 4 NVIDIA TITAN Xp GPUs.
+3 - Application des fonctions : Les fonctions sont appliquées dans l'ordre spécifié par le modèle. Ainsi la dernière fonction renvoit la réponse à la question.
 
-2, Run detection on the CLEVR-mini dataset. This step obtains the *proposed* masks of all objects in the dataset, which will be used for training the attribute network. 
-```
-python tools/test_net.py \
-    --dataset clevr_mini \
-    --cfg configs/baselines/e2e_mask_rcnn_R-50-FPN_1x.yaml \
-    --output_dir ../../data/mask_rcnn/results/clevr_mini \
-    --load_ckpt ../../data/mask_rcnn/outputs/ckpt/{checkpoint .pth file}
-```
-
-3, Extract the *proposed* CLEVR-mini object masks and pair them to the ground-truth objects via mask IoU
-```
-cd {repo_root}/scene_parse/attr_net
-```
-```
-python tools/process_proposals.py \
-    --dataset clevr \
-    --proposal_path ../../data/mask_rcnn/results/clevr_mini/detections.pkl \
-    --gt_scene_path ../../data/raw/CLEVR_mini/CLEVR_mini_coco_anns.json \
-    --output_path ../../data/attr_net/objects/clevr_mini_objs.json
-```
-
-4, Train the attribute network on the CLEVR-mini dataset, using the proposed masks plus ground-truth labels
-```
-python tools/run_train.py \
-    --run_dir ../../data/attr_net/outputs/trained_model \
-    --clevr_mini_ann_path ../../data/attr_net/objects/clevr_mini_objs.json \
-    --dataset clevr
-```
+Sur 10000 questions nous obtenons un taux de bonnes réponses de **99,4%**
 
 ### Contrastive Explanation
 
@@ -183,7 +135,11 @@ How many red objects are small shiny blocks or small rubber balls ?
 
 ---------
 
-Are there fewer tiny shiny cubes than green metallic things ?  
+Are there fewer tiny shiny cubes than green metallic things ?
+
+<div align="center">
+  <img src="img/CLEVR_val_000010.png" width="450px">
+</div>
 
 * Image : 10
 * Predicted answer: yes
@@ -196,6 +152,10 @@ Are there fewer tiny shiny cubes than green metallic things ?
 ---------
 
 How many other objects are there of the same color as the matte cylinder ?  
+
+<div align="center">
+  <img src="img/CLEVR_val_000003.png" width="450px">
+</div>
 
 * Image : 3
 * Predicted answer: 1
