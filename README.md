@@ -1,13 +1,24 @@
-# Neural-Symbolic Visual Question Answering (NS-VQA)
+# Neural-Symbolic Visual Question Answering with Contrastive Explanation (NS-VQA-CE)
 
-Pytorch implementation for Neural-Symbolic Visual Question Answering (NS-VQA) on the [CLEVR dataset](https://cs.stanford.edu/people/jcjohns/clevr/). 
+Implémetation Python du Github : (NSVQASP : https://github.com/pudumagico/nsvqasp) qui propose une technique de NS-VQA avec CE en ASP (Answer Set Programming) sur le **[CLEVR Dataset : https://cs.stanford.edu/people/jcjohns/clevr/]**
+
+### Publication NSVQASP 2023
+**[A Logic-based Approach to Contrastive Explainability for Neurosymbolic Visual Question Answering](https://www.ijcai.org/proceedings/2023/0408.pdf)**
+https://www.ijcai.org/proceedings/2023/0408.pdf
+
+<div align="center">
+  <img src="img/ce.png" width="750px">
+</div>
+
+Basé lui-même sur les travaux de : https://github.com/kexinyi/ns-vqa (qui nous a servi de point de départ)
+
+### Publication NSVQA 2018
+**[Neural-Symbolic VQA: Disentangling Reasoning from Vision and Language Understanding](https://arxiv.org/abs/1810.02338)**
 
 <div align="center">
   <img src="img/model.png" width="750px">
 </div>
 
-### Publication
-**[Neural-Symbolic VQA: Disentangling Reasoning from Vision and Language Understanding](https://arxiv.org/abs/1810.02338)**
 <br>
 Kexin Yi&ast;, 
 [Jiajun Wu](https://jiajunwu.com/)&ast;, 
@@ -31,51 +42,44 @@ In Neural Information Processing Systems (*NeurIPS*) 2018.
 }
 ```
 
-## Prerequisites
-* Linux Ubuntu 16.04
-* Python 3
-* NVIDIA GPU + CUDA 9.0
-* PyTorch 0.3.1 or 0.4.0
+## Prérequis
+* Python 3.10.13
 
-## Getting started
+## Pour faire tourner le code
 
-Clone this repository 
+Clonez ce répertoire
 ```
-git clone https://github.com/kexinyi/ns-vqa.git
+git clone https://github.com/vyktron/ns-vqa-ce.git
 ```
 
-Create an environment with all packages from `requirements.txt` installed (Note: please double check the CUDA version on your machine and install pytorch accordingly)
+Créer un environnement et installez tous les packages listés dans `requirements.txt`
 ```
-conda create --name ns-vqa -c conda-forge pytorch --file requirements.txt
-source activate ns-vqa
+python3.10 -m venv /path/to/new/virtual/environment
+pip install -r requirements.txt
 ```
 
-Run the following command at the root of the repository
+Lancez la commande suivante dans votre terminal avec l'environnement activé pour faire tourner l'algorithme sur 10000 questions portant sur 1000 images.
 ```
 python run.py --load_checkpoint_path data/pretrained/question_parser.pt --save_result_path data/reason/results --clevr_val_scene_path scene_parse/images/val_scene.json --clevr_vocab_path data/reason/clevr_h5/clevr_vocab.json
 ```
 
-## Run pretrained models
+## Fonctionnement
 
-This part requires downloading the pretrained models and placing them under `data/pretrained`. Our full model is consisted of three networks: an object detection network; an attribute extraction network; and a neural question parser. The first two networks form a scene parser that generates an abstract scene representation of an input image. The question parser turns an input question into a program. The symbolic program executor is integrated into the question parser which executes the logic of the program and outputs an answer. 
+### Etape 1 : Détection d'objets
 
-Both networks of the pretrained scene parser are trained on the CLEVR-mini dataset as described in the training section. The question parser is trained starting from 270 ground-truth programs plus all question-answer pairs from the CLEVR training set.
+Le détecteur d'objet est un modèle YoloV8n (Yolo version 8, nano = plus petit modèle) développé par ultralytics : (https://github.com/ultralytics/ultralytics)
+Il s'agit donc d'une version plus performante et compacte que YoloV5, utilisé dans la publication "NSVQASP 2023"
+De plus il est possible de faire tourner ce modèle sur CPU uniquement, contrairement à l'implémentation Mask-R-CNN utilisé dans la publication initiale de 2018.
 
-### Step 1: object detection
+Le modèle n'est pas présent dans ce répertoire, seuls les résultats des segmentations des 1000 images sont présentes (dans le fichier ```scene_parse/images/val_scene.json```)
 
-The object detector is a Mask R-CNN which inputs raw images and generates object proposals including their class labels, masks, and scores. To run the detector, go to directory
-```
-cd {repo_root}/scene_parse/mask_rcnn
-```
-and run
-```
-python tools/test_net.py \
-    --dataset clevr_original_val \
-    --cfg configs/baselines/e2e_mask_rcnn_R-50-FPN_1x.yaml \
-    --load_ckpt ../../data/pretrained/object_detector.pt \
-    --output_dir ../../data/mask_rcnn/results/clevr_val_pretrained
-```
-The network will output a file under `{repo_root}/data/mask_rcnn/results/clevr_val_pretrained/detections.pkl`(51.3MB) that stores all the object proposals.
+#### Exemple
+
+<div align="center">
+  <img src="img/train_batch0.jpg" width="750px">
+</div>
+
+
 
 ### Step 2: attribute extraction
 
