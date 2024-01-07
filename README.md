@@ -160,38 +160,18 @@ python tools/run_train.py \
     --dataset clevr
 ```
 
-### Reasoning
+### Contrastive Explanation
 
-Go to the "reason" directory
-```
-cd {repo_root}/reason
-```
+La dernière partie consiste à trouver une modification de la scène (bouger un objet, changer sa couleur, sa forme...) pour engendrer une modification de la réponse
 
-1, Make sure the raw questions are preprocessed. If you want to pre-train on a subset of questions uniformly sampled over the 90 question families, run
-```
-python tools/sample_questions.py \
-    --n_questions_per_family 3 \
-    --input_question_h5 ../data/reason/clevr_h5/clevr_train_questions.h5 \
-    --output_dir ../data/reason/clevr_h5
-```
+#### Exemple 
 
-2, Pretrain question parser
-```
-python tools/run_train.py \
-    --checkpoint_every 200 \
-    --num_iters 5000 \
-    --run_dir ../data/reason/outputs/model_pretrain_uniform_270pg \
-    --clevr_train_question_path ../data/reason/clevr_h5/clevr_train_3questions_per_family.h5
-```
+How many red objects are small shiny blocks or small rubber balls ?  
 
-3, Fine-tune question parser
-```
-python tools/run_train.py \
-    --reinforce 1 \
-    --learning_rate 1e-5 \
-    --checkpoint_every 2000 \
-    --num_iters 1000000 \
-    --run_dir ../data/reason/outputs/model_reinforce_uniform_270pg \
-    --load_checkpoint_path ../data/reason/outputs/model_pretrain_uniform_270pg/checkpoint.pt
-```
-The output models are stored in the folder `{repo_root}/data/reason/outputs/model_reinforce_uniform_270pg`.
+* Image : 998
+* Predicted answer: 1
+* Ground truth answer: 1
+* Modified answer: 0
+* Cost: 11
+* Description: change_size 4 : small -> large
+* Modified scene: [{'id': '998-0', 'position': [1.2073033273220062, 1.4945631957054137, 0.7], 'color': 'brown', 'material': 'rubber', 'shape': 'cube', 'size': 'large'}, {'id': '998-1', 'position': [1.6233381736278534, -2.141068323254585, 0.35], 'color': 'gray', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-2', 'position': [-1.154744883775711, -1.1294089430570604, 0.35], 'color': 'blue', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-3', 'position': [-1.693931791782379, 1.8313643437623979, 0.7], 'color': 'cyan', 'material': 'rubber', 'shape': 'cylinder', 'size': 'large'}, {'id': '998-4', 'position': [0.6711750781536102, -2.412887197732925, 0.7], 'color': 'red', 'material': 'metal', 'shape': 'cube', 'size': 'large'}, {'id': '998-5', 'position': [0.3581746220588684, -0.5633923751115799, 0.35], 'color': 'blue', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-6', 'position': [-3.7221895015239714, -0.08891469061374657, 0.35], 'color': 'brown', 'material': 'metal', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-7', 'position': [-2.910327101945877, 0.874869332909584, 0.35], 'color': 'gray', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-8', 'position': [-0.5011349391937258, -2.678761799931526, 0.35], 'color': 'gray', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}]
