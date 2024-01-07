@@ -91,8 +91,11 @@ if __name__ == "__main__" :
         for i in range(pg_np.shape[0]):
             pred_ans, scene = executor.run(pg_np[i], idx_np[i], 'val', guess=True)
             print("Scene: %s" % scene)
-            _, _, desc = executor.modify_scene(scene)
+            scene_, _, desc = executor.modify_scene(scene)
             print("Modification: %s" % desc)
+            print("New scene: %s" % scene_)
+            mod_pred_ans, _ = executor.run(pg_np[i], idx_np[i], 'val', guess=True, scene=scene_)
+            print("Modified answer: %s" % mod_pred_ans)
             gt_ans = executor.vocab['answer_idx_to_token'][ans_np[i]]
 
             print("Predicted answer: %s" % pred_ans)

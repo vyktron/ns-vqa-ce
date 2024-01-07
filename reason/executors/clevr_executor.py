@@ -528,7 +528,7 @@ class ClevrExecutor:
             The new scene
         """
 
-        cost += 12
+        cost += 13
 
         # Deep copy the scene
         scene_ = json.loads(json.dumps(scene))
@@ -737,7 +737,7 @@ class ClevrExecutor:
             The new scene
         """
 
-        cost += 11
+        cost += 10
 
         # Deep copy the scene
         scene_ = json.loads(json.dumps(scene))

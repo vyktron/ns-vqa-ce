@@ -171,7 +171,6 @@ def write_json(parser : SceneParser, path : str = "scene_parse", split : str = "
         result = parser.predict(path_to_img)
 
         res_dict["scenes"].append(build_dict(parser.get_attributes(result), index))
-    
     # Order scenes by image_index
     
     # Save the json
@@ -183,7 +182,7 @@ if __name__ == "__main__" :
     parser = SceneParser()
     parser.init()
     
-    write_json(parser, split="test")
+    write_json(parser, split="val")
     
 
 
