@@ -50,32 +50,9 @@ conda create --name ns-vqa -c conda-forge pytorch --file requirements.txt
 source activate ns-vqa
 ```
 
-Download data and pretrained model
+Run the following command at the root of the repository
 ```
-sh download.sh
-```
-
-Compile CUDA code for Mask-RCNN
-```
-cd {repo_root}/scene_parse/mask_rcnn/lib  # change to this directory
-sh make.sh
-```
-
-Preprocess the CLEVR questions
-```
-cd {repo_root}/reason
-
-# clevr-train
-python tools/preprocess_questions.py \
-    --input_questions_json ../data/raw/CLEVR_v1.0/questions/CLEVR_train_questions.json \
-    --output_h5_file ../data/reason/clevr_h5/clevr_train_questions.h5 \
-    --output_vocab_json ../data/reason/clevr_h5/clevr_vocab.json
-
-# clevr-val
-python tools/preprocess_questions.py \
-    --input_questions_json ../data/raw/CLEVR_v1.0/questions/CLEVR_val_questions.json \
-    --output_h5_file ../data/reason/clevr_h5/clevr_val_questions.h5 \
-    --input_vocab_json ../data/reason/clevr_h5/clevr_vocab.json
+python run.py --load_checkpoint_path data/pretrained/question_parser.pt --save_result_path data/reason/results --clevr_val_scene_path scene_parse/images/val_scene.json --clevr_vocab_path data/reason/clevr_h5/clevr_vocab.json
 ```
 
 ## Run pretrained models

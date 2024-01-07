@@ -114,4 +114,12 @@ if __name__ == "__main__" :
         print('| %d/%d questions processed, accuracy %f' % (stats['total'], len(loader.dataset), stats['correct_ans'] / stats['total']))
         print("\n")
 
+    print("Question type accuracy:")
+    print('| count accuracy: %f' % (stats['count'] / stats['count_tot']))
+    print('| exist accuracy: %f' % (stats['exist'] / stats['exist_tot']))
+    print('| compare_num accuracy: %f' % (stats['compare_num'] / stats['compare_num_tot']))
+    print('| compare_attr accuracy: %f' % (stats['compare_attr'] / stats['compare_attr_tot']))
+    print('| query accuracy: %f' % (stats['query'] / stats['query_tot']))
+    print("\n")
+
     
