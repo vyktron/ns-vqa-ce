@@ -7,8 +7,14 @@ from reason.options.test_options import TestOptions
 
 from reason.models import create_seq2seq_net, get_vocab
 from reason.models.parser import Seq2seqParser
-from reason.executors import get_executor
+from reason.executors import get_executor, ClevrExecutor
 import reason.utils.utils as utils
+
+# Show content of a .h5 file
+import h5py
+import numpy as np
+import reason.datasets.clevr_questions as clevr_questions
+from torch.utils.data import DataLoader
 
 
 def find_clevr_question_type(out_mod):
@@ -36,14 +42,26 @@ def check_program(pred, gt):
             break
     return True
 
+def browse_space_search(pg_np, executor : ClevrExecutor, idx, scene : list, pred_ans : str):
+    """Browse the space of possible scenes to find a scene that matches a foil answer"""
+
+    desc = ""; cost = 1000; mod_ans = "" ; mod_scene = scene
+    foil_answers = executor.find_foil_answers(pred_ans)
+
+    i = 0
+    while i < 100000 and cost > 10:
+        scene_, cost_, desc_ = executor.modify_scene(scene, max_cost=cost)
+        new_pred_ans, _ = executor.run(pg_np, idx, 'val', guess=True, scene=scene_)
+
+        if new_pred_ans in foil_answers and cost_ < cost:
+            i = 100000 - cost_*10
+            cost = cost_  ; desc = desc_ ; mod_ans = new_pred_ans ; mod_scene = scene_
+        i += 1
+    
+    return desc, mod_ans, cost, mod_scene
+
 
 if __name__ == "__main__" :
-    
-    # Show content of a .h5 file
-    import h5py
-    import numpy as np
-    import reason.datasets.clevr_questions as clevr_questions
-    from torch.utils.data import DataLoader
 
 
     f = h5py.File("data/reason/clevr_h5/clevr_val_questions.h5", "r")
@@ -69,7 +87,7 @@ if __name__ == "__main__" :
         'total': 0
     }
 
-    dataset = clevr_questions.ClevrQuestionDataset("data/reason/clevr_h5/clevr_val_questions.h5", 1000, "data/reason/clevr_h5/clevr_vocab.json")
+    dataset = clevr_questions.ClevrQuestionDataset("data/reason/clevr_h5/clevr_val_questions.h5", 10000, "data/reason/clevr_h5/clevr_vocab.json")
     
     loader = DataLoader(dataset=dataset, batch_size=1, shuffle=0, num_workers=1)
     executor = get_executor(opt)
@@ -86,20 +104,23 @@ if __name__ == "__main__" :
                 print("?")
                 break
             print(dataset.vocab['question_idx_to_token'][x_list[0][i]], end=" ")
-            #TODO Changer les probabilités de choix des objets pour prendre en compte la confiance de la detection d'objet
 
         for i in range(pg_np.shape[0]):
+            if idx_np[i] > 1000:
+                continue
             pred_ans, scene = executor.run(pg_np[i], idx_np[i], 'val', guess=True)
-            print("Scene: %s" % scene)
-            scene_, _, desc = executor.modify_scene(scene)
-            print("Modification: %s" % desc)
-            print("New scene: %s" % scene_)
-            mod_pred_ans, _ = executor.run(pg_np[i], idx_np[i], 'val', guess=True, scene=scene_)
-            print("Modified answer: %s" % mod_pred_ans)
-            gt_ans = executor.vocab['answer_idx_to_token'][ans_np[i]]
+            # Contrastive explanation
+            desc, mod_ans, cost, mod_scene = browse_space_search(pg_np[i], executor, idx_np[i], scene, pred_ans)
 
+            gt_ans = executor.vocab['answer_idx_to_token'][ans_np[i]]
+            print("Image : %d" % idx_np[i])
             print("Predicted answer: %s" % pred_ans)
             print("Ground truth answer: %s" % gt_ans)
+            print("--------------------")
+            print("Modified answer: %s" % mod_ans)
+            print("Cost: %d" % cost)
+            print("Description: %s" % desc)
+            print("Modified scene: %s" % mod_scene)
 
             q_type = find_clevr_question_type(executor.vocab['program_idx_to_token'][y_np[i][1]])
             print("Question type: %s" % q_type)

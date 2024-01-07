@@ -471,14 +471,12 @@ class ClevrExecutor:
         return 'error'
     
     # Contrastive Explanation methods
-    def find_foil_answers(self, scene : list[dict], answer : str) -> list :
+    def find_foil_answers(self, answer : str) -> list :
         """
         Find the foil answers for a given question type
 
         Parameters
         ----------
-        scene : list[dict]
-            The scene list of objects (dictionaries)
         answer : str
             The answer to the question (given by the model)
         
@@ -532,9 +530,11 @@ class ClevrExecutor:
 
         # Deep copy the scene
         scene_ = json.loads(json.dumps(scene))
+        # Get the last object id
+        last_id = scene_[-1]["id"].split("-")[1]
         # Construct the new object
         obj = {
-            "id": str(scene_[0]["id"].split("-")[1]) + "-" + str(len(scene_)),
+            "id": str(scene_[0]["id"].split("-")[0]) + "-" + str(int(last_id) + 1),
             # Random position
             "position": [random.uniform(-3, 3), random.uniform(-3, 3), 0.35],
             "color": random.choice(self.colors),
@@ -547,7 +547,7 @@ class ClevrExecutor:
         if obj["size"] == "large" :
             obj["position"][2] = 0.7
         
-        desc = "add object " + str(len(scene_))
+        desc = "add object " + str(int(last_id) + 1)
 
         # Add the object to the scene
         scene_.append(obj)     
@@ -575,10 +575,11 @@ class ClevrExecutor:
         scene_ = json.loads(json.dumps(scene))
         # Get a random index
         index = random.randrange(len(scene_))
+        index_ = scene_[index]["id"].split("-")[1]
         # Remove the object
         scene_.pop(index)
 
-        desc = "remove_object " + str(index)
+        desc = "remove_object " + index_
 
         return scene_, cost, desc
     
@@ -607,6 +608,8 @@ class ClevrExecutor:
         index = random.randrange(len(scene_))
         # Get the object to change the shape
         obj = scene_[index]
+        index = scene_[index]["id"].split("-")[1]
+        
 
         prev_shape = obj["shape"]
         # Change the shape
@@ -639,8 +642,10 @@ class ClevrExecutor:
         scene_ = json.loads(json.dumps(scene))
         # Get a random index
         index = random.randrange(len(scene_))
-        # Get the object to change the color
         obj = scene_[index]
+        index = scene_[index]["id"].split("-")[1]
+        # Get the object to change the color
+        
 
         prev_color = obj["color"]
         # Change the color
@@ -675,7 +680,8 @@ class ClevrExecutor:
         index = random.randrange(len(scene_))
         # Get the object to change the material
         obj = scene_[index]
-
+        index = scene_[index]["id"].split("-")[1]
+        
         prev_material = obj["material"]
         # Change the material
         obj["material"] = random.choice([m for m in self.materials if m != obj["material"]])
@@ -709,6 +715,8 @@ class ClevrExecutor:
         index = random.randrange(len(scene_))
         # Get the object to change the size
         obj = scene_[index]
+        index = scene_[index]["id"].split("-")[1]
+        
 
         prev_size = obj["size"]
         # Change the size
@@ -745,6 +753,8 @@ class ClevrExecutor:
         index = random.randrange(len(scene_))
         # Get the object to move
         obj = scene_[index]
+        index = scene_[index]["id"].split("-")[1]
+        
         # Choose a random direction
         direction = random.choice(["up", "down", "left", "right"])
         # Move the object in the chosen direction (by 0.5)
@@ -761,7 +771,7 @@ class ClevrExecutor:
 
         return scene_, cost, desc
     
-    def modify_scene(self, scene : list[dict], cost=0) -> list :
+    def modify_scene(self, scene : list[dict], max_cost) -> list :
         """
         Modify the scene by adding, removing, moving or changing an object
 
@@ -769,6 +779,8 @@ class ClevrExecutor:
         ----------
         scene : list[dict]
             The scene list of objects (dictionaries)
+        max_cost : int
+            The maximum cost of the modification
         
         Returns
         -------
@@ -776,10 +788,25 @@ class ClevrExecutor:
             The new scene
         """
 
+        cost = 0
+
         # Deep copy the scene
         scene_ = json.loads(json.dumps(scene))
+
+        # List of possible modifications
+        modifications = ["add", "remove", "move", "change_size", "change_shape", "change_color", "change_material"]
+        if max_cost < 13 :
+            modifications.remove("add")
+        if max_cost < 12 :
+            modifications.remove("remove")
+        if max_cost < 11 :
+            modifications.remove("change_size")
+            modifications.remove("change_shape")
+            modifications.remove("change_color")
+            modifications.remove("change_material")
+        
         # Choose a random modification
-        modification = random.choice(["add", "remove", "move", "change_size", "change_shape", "change_color", "change_material"])
+        modification = random.choice(modifications)
         # Modify the scene
         if modification == "add" :
             scene_, cost, desc = self.add_object(scene_, cost)
@@ -795,6 +822,11 @@ class ClevrExecutor:
             scene_, cost, desc = self.change_color(scene_, cost)
         else :
             scene_, cost, desc = self.change_material(scene_, cost)
+
+        # Add a random chance to modify the scene again
+        if random.random() < 0.6 and cost + 10 < max_cost and len(scene_) > 0:
+            scene_, cost_, desc_ = self.modify_scene(scene_, max_cost - cost)
+            cost += cost_ ; desc += "; " + desc_
 
         return scene_, cost, desc
     
