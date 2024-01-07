@@ -162,14 +162,15 @@ python tools/run_train.py \
 
 ### Contrastive Explanation
 
-La dernière partie consiste à trouver une modification de la scène (bouger un objet, changer sa couleur, sa forme...) pour engendrer une modification de la réponse
+La dernière partie consiste à trouver une modification de la scène (bouger un objet, changer sa couleur, sa forme...) pour engendrer une modification de la réponse.  
+Pour se faire on applique des transformations aléatoires à la scène. (Une modification peu
 
-#### Exemple 
+#### Exemples
 
 How many red objects are small shiny blocks or small rubber balls ?  
 
 <div align="center">
-  <img src="scene_parse/images/val/CLEVR_val_000998.png" width="750px">
+  <img src="img/CLEVR_val_000998.png" width="450px">
 </div>
 
 * Image : 998
@@ -179,3 +180,30 @@ How many red objects are small shiny blocks or small rubber balls ?
 * Cost: 11
 * Description: change_size 4 : small -> large
 * Modified scene: [{'id': '998-0', 'position': [1.2073033273220062, 1.4945631957054137, 0.7], 'color': 'brown', 'material': 'rubber', 'shape': 'cube', 'size': 'large'}, {'id': '998-1', 'position': [1.6233381736278534, -2.141068323254585, 0.35], 'color': 'gray', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-2', 'position': [-1.154744883775711, -1.1294089430570604, 0.35], 'color': 'blue', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-3', 'position': [-1.693931791782379, 1.8313643437623979, 0.7], 'color': 'cyan', 'material': 'rubber', 'shape': 'cylinder', 'size': 'large'}, {'id': '998-4', 'position': [0.6711750781536102, -2.412887197732925, 0.7], 'color': 'red', 'material': 'metal', 'shape': 'cube', 'size': **'large'**}, {'id': '998-5', 'position': [0.3581746220588684, -0.5633923751115799, 0.35], 'color': 'blue', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-6', 'position': [-3.7221895015239714, -0.08891469061374657, 0.35], 'color': 'brown', 'material': 'metal', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-7', 'position': [-2.910327101945877, 0.874869332909584, 0.35], 'color': 'gray', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}, {'id': '998-8', 'position': [-0.5011349391937258, -2.678761799931526, 0.35], 'color': 'gray', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}]
+
+---------
+
+Are there fewer tiny shiny cubes than green metallic things ?  
+
+* Image : 10
+* Predicted answer: yes
+* Ground truth answer: yes
+* Modified answer: no
+* Cost: 22
+* Description: change_color 1 : green -> red; change_size 0 : large -> small
+* Modified scene: [{'id': '10-0', 'position': [-3.292278846502304, 0.5576739799976349, 0.35], 'color': 'green', 'material': 'metal', 'shape': 'cube', 'size': **'small'**}, {'id': '10-1', 'position': [3.900321793556213, -0.026275967359542886, 0.7], 'color': **'red'**, 'material': 'metal', 'shape': 'cube', 'size': 'large'}, {'id': '10-2', 'position': [-0.43689026713371265, -1.1574226140975952, 0.35], 'color': 'purple', 'material': 'metal', 'shape': 'cube', 'size': 'small'}, {'id': '10-3', 'position': [1.6506794977188113, -1.5154066717624666, 0.7], 'color': 'green', 'material': 'metal', 'shape': 'cube', 'size': 'large'}, {'id': '10-4', 'position': [0.7856634902954102, 1.2383994382619856, 0.35], 'color': 'purple', 'material': 'rubber', 'shape': 'cylinder', 'size': 'small'}]
+
+---------
+
+How many other objects are there of the same color as the matte cylinder ?  
+
+* Image : 3
+* Predicted answer: 1
+* Ground truth answer: 1
+* Modified answer: 10
+* Cost: 11
+* Description: change_material 5 : rubber -> metal
+* Modified scene: [{'id': '3-0', 'position': [1.3302829301357268, -0.6800348329544067, 0.7], 'color': 'purple', 'material': 'metal', 'shape': 'sphere', 'size': 'large'}, {'id': '3-1', 'position': [0.25077290534973173, -3.094255012869835, 0.7], 'color': 'purple', 'material': 'metal', 'shape': 'sphere', 'size': 'large'}, {'id': '3-2', 'position': [-2.9378172171115873, 1.2698937779664992, 0.7], 'color': 'gray', 'material': 'rubber', 'shape': 'cube', 'size': 'large'}, {'id': '3-3', 'position': [-0.671323869228363, 3.4335732942819592, 0.35], 'color': 'yellow', 'material': 'rubber', 'shape': 'sphere', 'size': 'small'}, {'id': '3-4', 'position': [-1.843806345462799, 0.3182424312829972, 0.35], 'color': 'brown', 'material': 'metal', 'shape': 'cylinder', 'size': 'small'}, {'id': '3-5', 'position': [-1.3637827014923094, -1.3849538600444793, 0.35], 'color': 'brown', 'material': **'metal'**, 'shape': 'cylinder', 'size': 'small'}, {'id': '3-6', 'position': [1.810978947877884, -2.2910381257534027, 0.7], 'color': 'blue', 'material': 'metal', 'shape': 'cylinder', 'size': 'large'}]
+
+Comme le cylindre "mate" n'est plus mate car il est devenu métallique. Donc la question se retrouve sans réel sens après cette modification.
+
