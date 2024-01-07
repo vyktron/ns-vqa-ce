@@ -79,33 +79,23 @@ Le modèle n'est pas présent dans ce répertoire, seuls les résultats des segm
   <img src="img/train_batch0.jpg" width="750px">
 </div>
 
+Le modèle a été entrainé sur un dataset nommé "CLEVR-Mini" qui contient 4000 images et les coordonnées de la segmentation de chaque objet.
+Le modèle est capable de reconnaître 96 classes : (Taille_Couleur_Texture_Forme)
+* "Large_Red_Metal_Sphere": 0,
+* "Large_Red_Metal_Cube": 1,
+* "Large_Red_Metal_Cylinder": 2,
+* "Large_Red_Rubber_Sphere": 3,
+* ...
 
+Ensuite à partir des objets détectés et leurs coordonnées nous sommes capables d'obtenir le tableau des attributs de la scène.
 
-### Step 2: attribute extraction
+#### Performance
 
-The next step is to feed the detected objects into an attribute network to extract their attributes and form abstract representations of the input scenes. First, go to directory
-```
-cd {repo_root}/scene_parse/attr_net
-```
-and process the detection result
-```
-python tools/process_proposals.py \
-    --dataset clevr \
-    --proposal_path ../../data/mask_rcnn/results/clevr_val_pretrained/detections.pkl \
-    --output_path ../../data/attr_net/objects/clevr_val_objs_pretrained.json
-```
-This will generate an object file at `{repo_root}/data/attr_net/objects/clevr_val_objs_pretrained.json`(17.5MB) which can be loaded by the attribute network.
+<div align="center">
+  <img src="img/results.png" width="750px">
+</div>
 
-Then, run attribute extraction
-```
-python tools/run_test.py \
-    --run_dir ../../data/attr_net/results \
-    --dataset clevr \
-    --load_checkpoint_path ../../data/pretrained/attribute_net.pt \
-    --clevr_val_ann_path ../../data/attr_net/objects/clevr_val_objs_pretrained.json \
-    --output_path ../../data/attr_net/results/clevr_val_scenes_parsed_pretrained.json
-```
-The output file `{repo_root}/data/attr_net/results/clevr_val_scenes_parsed_pretrained.json`(15.2MB) stores the parsed scenes that are going to be used for reasoning.
+Le modèle converge effectivement avec notamment une **précision de 99,6%** pour les classes attribuées
 
 ### Step 3: reasoning
 
