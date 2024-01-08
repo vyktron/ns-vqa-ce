@@ -101,18 +101,25 @@ Le modèle converge effectivement avec notamment une **précision de 99,6%** pou
 
 L'objectif du question parsing est de traduire les questions formulées en langage naturel en fonctions applicable aux attributs de la scène.
 
-Un modèle LSTM (Long-Short Term Memory) est utilisé pour réaliser la question parsing.
+Are there more green objects than tiny rubber cylinders?  
+*Existe-t-il plus d'objets verts que de petits cylindres en caoutchouc ?*
+
+Un modèle **LSTM** (Long-Short Term Memory) est utilisé pour réaliser la question parsing.
 Les LSTM sont adaptés à ce genre de tâches car ils permettent de bien gérer la temporalité des mots dans les questions ainsi que les dépendances à long terme.
 
 1 - Tokenisation : La question est divisée en tokens (unités linguistiques) compréhensibles par le modèle.
 
 2 - Inférence : Le modèle renvoit une suite de token correspondant aux fonctions de raisonnements (filtrer les objets rouges, métalliques...)
 
-3 - Application des fonctions : Les fonctions sont appliquées dans l'ordre spécifié par le modèle. Ainsi la dernière fonction renvoit la réponse à la question.
+3 - Application des fonctions : Les fonctions sont appliquées dans l'ordre spécifié par le modèle. Ainsi la dernière fonction renvoit la réponse à la question.7
+
+"greater than ( count(filter_color(green)) , count( intersect( intersect(filter_size(small), filter_shape(cylinder)), filter_material(rubber) ) ) )" **9 fonctions**
+
+-----
 
 Sur 10000 questions nous obtenons un taux de bonnes réponses de **99,4%**
 
-### Contrastive Explanation
+### Etape 3 : Contrastive Explanation
 
 La dernière partie consiste à trouver une modification de la scène (bouger un objet, changer sa couleur, sa forme...) pour engendrer une modification de la réponse.  
 Pour se faire on applique des transformations aléatoires à la scène. (Une modification peu
