@@ -121,7 +121,7 @@ Les LSTM sont adaptés à ce genre de tâches car ils permettent de bien gérer 
 -----
 
 Sur 10000 questions nous obtenons un taux de bonnes réponses de **99,4%**
-(Sachant que la détection d'objet à une precision de 99,6%, on peut difficilement dépasser ce pourcentage. La performance obtenu en 2018 était de 99,8%)
+(Sachant que la détection d'objet a une précision de 99,6%, on peut difficilement dépasser ce pourcentage. La performance obtenu en 2018 était de 99,8%)
 
 ### Etape 3 : Contrastive Explanation
 
