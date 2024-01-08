@@ -124,8 +124,8 @@ Sur 10000 questions nous obtenons un taux de bonnes réponses de **99,4%**
 
 ### Etape 3 : Contrastive Explanation
 
-La dernière partie consiste à trouver une modification de la scène (bouger un objet, changer sa couleur, sa forme...) pour engendrer une modification de la réponse.  
-Pour se faire on applique des transformations aléatoires à la scène. (Une modification peu
+La dernière partie consiste à trouver un modification de la scène (bouger un objet, changer sa couleur, sa forme...) pour engendrer une réponse différente à une question donnée.  
+Pour se faire on applique des transformations aléatoires à la scène. (Une modification peut-être une succession de transformations)
 
 #### Exemples
 
