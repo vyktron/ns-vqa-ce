@@ -92,7 +92,7 @@ Ensuite à partir des objets détectés et leurs coordonnées nous sommes capabl
 #### Performance
 
 <div align="center">
-  <img src="img/results.png" width="750px">
+  <img src="img/results.png" height="400px">
 </div>
 
 Le modèle converge effectivement avec notamment une **précision de 99,6%** pour les classes attribuées
