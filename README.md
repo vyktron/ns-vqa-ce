@@ -111,7 +111,7 @@ Les LSTM sont adaptés à ce genre de tâches car ils permettent de bien gérer 
 
 2 - Inférence : Le modèle renvoit une suite de token correspondant aux fonctions de raisonnements (filtrer les objets rouges, métalliques...)
 
-3 - Application des fonctions : Les fonctions sont appliquées dans l'ordre spécifié par le modèle. Ainsi la dernière fonction renvoit la réponse à la question.7
+3 - Application des fonctions : Les fonctions sont appliquées dans l'ordre spécifié par le modèle. Ainsi la dernière fonction renvoit la réponse à la question.
 
 "greater than ( count(filter_color(green)) , count( intersect( intersect(filter_size(small), filter_shape(cylinder)), filter_material(rubber) ) ) )" **9 fonctions**
 
