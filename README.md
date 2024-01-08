@@ -101,9 +101,11 @@ Le modèle converge effectivement avec notamment une **précision de 99,6%** pou
 
 L'objectif du question parsing est de traduire les questions formulées en langage naturel en fonctions applicable aux attributs de la scène.
 
+#### Question
 Are there more green objects than tiny rubber cylinders?  
 *Existe-t-il plus d'objets verts que de petits cylindres en caoutchouc ?*
 
+#### Processing
 Un modèle **LSTM** (Long-Short Term Memory) est utilisé pour réaliser la question parsing.
 Les LSTM sont adaptés à ce genre de tâches car ils permettent de bien gérer la temporalité des mots dans les questions ainsi que les dépendances à long terme.
 
@@ -113,6 +115,7 @@ Les LSTM sont adaptés à ce genre de tâches car ils permettent de bien gérer 
 
 3 - Application des fonctions : Les fonctions sont appliquées dans l'ordre spécifié par le modèle. Ainsi la dernière fonction renvoit la réponse à la question.
 
+#### Fonctions
 "greater than ( count(filter_color(green)) , count( intersect( intersect(filter_size(small), filter_shape(cylinder)), filter_material(rubber) ) ) )" **9 fonctions**
 
 -----
